@@ -241,17 +241,20 @@ public class Matrix {
 
     // Everything Gauss-Seidel
 
+    int count = 0;
     public boolean transformToDominant(double[][] M, int r, boolean[] V, int[] R)
     {
         int n = M.length;
         if (r == n) {
-            double[][] T = new double[n][n+1];
+            double[][] T = new double[n][n];
             for (int i = 0; i < R.length; i++) {
-                for (int j = 0; j < n + 1; j++)
+                for (int j = 0; j < n; j++) {
                     T[i][j] = M[R[i]][j];
+                }
             }
 
             M = T;
+            this.data = M;
 
             return true;
         }
@@ -280,7 +283,7 @@ public class Matrix {
 
 
     /**
-     * Returns true if is possible to transform M(data member) to a diagonally
+     * Returns true if is possible to transform M to a diagonally
      * dominant matrix, false otherwise.
      */
     public boolean makeDominant()
@@ -296,22 +299,31 @@ public class Matrix {
     }
 
 
-    /**
-     * Applies GaussSeidel method to find the solution of the system
-     * of linear equations represented in matrix M.
-     * M is a matrix with the following form:
-     * a_11 * x_1 + a_12 * x_2 + ... + a_1n * x_n = b_1
-     * a_21 * x_1 + a_22 * x_2 + ... + a_2n * x_n = b_2
-     * .                 .                  .        .
-     * .                 .                  .        .
-     * .                 .                  .        .
-     * a_n1 * x_n + a_n2 * x_2 + ... + a_nn * x_n = b_n
-     */
-    public void solve()
+    public void gaussSeidel(Matrix vec_b)
     {
+        double[][] b = vec_b.data;
+        double[][] A = this.data;
+        double[][] Ab = Arrays.copyOf(A, A.length + 1); // New array with row size of old array + 1
+
+        //Ab[A.length] = new String[A.length]; // Initializing the new row
+
+// Copying data from d array to the newsr array
+        for (int i = 0; i < A.length; i++) {
+            Ab[A.length][i] = b[i][0];
+        }
+
+        Matrix temp1 = new Matrix(Ab);
+        System.out.println("---Ab---");
+        temp1.show();
+
+
+
         int iterations = 0;
         int n = this.n;
         double[][] M = this.data;
+        Matrix temp = new Matrix(M);
+        System.out.println("---GS---");
+        temp.show();
         double epsilon = 1e-15;
         double[] X = new double[n]; // Approximations
         double[] P = new double[n]; // Prev
