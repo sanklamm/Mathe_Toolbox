@@ -1,6 +1,11 @@
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args){
+
+        Matrix randMat = Matrix.random(5, 5);
+        randMat.show();
+        System.out.println("Diagonalisiert");
+        randMat.diagonalize().show();
 
         double[][] matData = {{1, 2, 3},{2, 3, 4},{3, 4, 7}};
         double[][] vecData = {{1}, {3}, {5}};

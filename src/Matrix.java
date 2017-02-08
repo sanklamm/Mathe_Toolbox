@@ -56,6 +56,17 @@ public class Matrix {
         return dim;
     }
 
+    // create and return a random M-by-N matrix with values between 0 and 1
+    public static Matrix random(int M, int N) {
+        Matrix A = new Matrix(M, N);
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < N; j++) {
+                A.data[i][j] = (int) (10 * Math.random());
+            }
+        }
+        return A;
+    }
+
     public void swap(int i, int j) {
         double[] temp = data[i];
         data[i] = data[j];
