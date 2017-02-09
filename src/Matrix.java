@@ -1,5 +1,3 @@
-import java.util.Arrays;
-
 /**
  * Created by s on 12.12.16.
  */
@@ -137,7 +135,7 @@ public class Matrix {
             b.swap(i, max);
 
             // singular
-            if (A.data[i][i] == 0.0) throw new RuntimeException("Matrix singul‰r.");
+            if (A.data[i][i] == 0.0) throw new RuntimeException("Matrix singulaer.");
 
             // pivot b
             for (int j = i + 1; j < n; j++)
@@ -147,14 +145,22 @@ public class Matrix {
             for (int j = i + 1; j < n; j++) {
                 double m = A.data[j][i] / A.data[i][i];
                 for (int k = i+1; k < n; k++) {
-                    A.data[j][k] = A.data[j][k] - A.data[i][k] * m;
+                    A.data[j][k] -= A.data[i][k] * m;
                 }
                 A.data[j][i] = 0.0;
             }
         }
-        b.show();
+        // back substitution
+        Matrix x = new Matrix(n, 1);
+        for (int j = n - 1; j >= 0; j--) {
+            double t = 0.0;
+            for (int k = j + 1; k < n; k++)
+                t += A.data[j][k] * x.data[k][0];
+            x.data[j][0] = (b.data[j][0] - t) / A.data[j][j];
+        }
+        A.show();
 
-        return A;
+        return x;
 
     }
 
@@ -237,126 +243,6 @@ public class Matrix {
         Matrix result = new Matrix(L);
 
         return result;
-    }
-
-    // Everything Gauss-Seidel
-
-    int count = 0;
-    public boolean transformToDominant(double[][] M, int r, boolean[] V, int[] R)
-    {
-        int n = M.length;
-        if (r == n) {
-            double[][] T = new double[n][n];
-            for (int i = 0; i < R.length; i++) {
-                for (int j = 0; j < n; j++) {
-                    T[i][j] = M[R[i]][j];
-                }
-            }
-
-            M = T;
-            this.data = M;
-
-            return true;
-        }
-
-        for (int i = 0; i < n; i++) {
-            if (V[i]) continue;
-
-            double sum = 0;
-
-            for (int j = 0; j < n; j++)
-                sum += Math.abs(M[i][j]);
-
-            if (2 * Math.abs(M[i][r]) > sum) { // diagonally dominant?
-                V[i] = true;
-                R[r] = i;
-
-                if (transformToDominant(M, r + 1, V, R))
-                    return true;
-
-                V[i] = false;
-            }
-        }
-
-        return false;
-    }
-
-
-    /**
-     * Returns true if is possible to transform M to a diagonally
-     * dominant matrix, false otherwise.
-     */
-    public boolean makeDominant()
-    {
-        double[][] M = this.data;
-        int n = this.n;
-        boolean[] visited = new boolean[n];
-        int[] rows = new int[n];
-
-        Arrays.fill(visited, false);
-
-        return transformToDominant(M, 0, visited, rows);
-    }
-
-
-    public void gaussSeidel(Matrix vec_b)
-    {
-        double[][] b = vec_b.data;
-        double[][] A = this.data;
-        double[][] Ab = Arrays.copyOf(A, A.length + 1); // New array with row size of old array + 1
-
-        //Ab[A.length] = new String[A.length]; // Initializing the new row
-
-// Copying data from d array to the newsr array
-        for (int i = 0; i < A.length; i++) {
-            Ab[A.length][i] = b[i][0];
-        }
-
-        Matrix temp1 = new Matrix(Ab);
-        System.out.println("---Ab---");
-        temp1.show();
-
-
-
-        int iterations = 0;
-        int n = this.n;
-        double[][] M = this.data;
-        Matrix temp = new Matrix(M);
-        System.out.println("---GS---");
-        temp.show();
-        double epsilon = 1e-15;
-        double[] X = new double[n]; // Approximations
-        double[] P = new double[n]; // Prev
-        Arrays.fill(X, 0);
-
-        while (true) {
-            for (int i = 0; i < n; i++) {
-                double sum = M[i][n]; // b_n
-
-                for (int j = 0; j < n; j++)
-                    if (j != i)
-                        sum -= M[i][j] * X[j];
-
-                // Update x_i to use in the next row calculation
-                X[i] = 1/M[i][i] * sum;
-            }
-
-            System.out.print("X_" + iterations + " = {");
-            for (int i = 0; i < n; i++)
-                System.out.print(X[i] + " ");
-            System.out.println("}");
-
-            iterations++;
-            if (iterations == 1) continue;
-
-            boolean stop = true;
-            for (int i = 0; i < n && stop; i++)
-                if (Math.abs(X[i] - P[i]) > epsilon)
-                    stop = false;
-
-            if (stop || iterations == MAX_ITERATIONS) break;
-            P = (double[])X.clone();
-        }
     }
 
 }
