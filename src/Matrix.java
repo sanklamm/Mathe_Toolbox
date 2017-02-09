@@ -4,9 +4,6 @@
 
 public class Matrix {
 
-    private static final double EPSILON = 1e-10;
-    public static final int MAX_ITERATIONS = 100;
-
     private int m;
     private int n;
     private double[][] data;
