@@ -65,6 +65,36 @@ public class Matrix {
         return A;
     }
 
+    public static Matrix addMatrix(Matrix A, Matrix B){
+        int n = A.n;
+        int m = A.m;
+        Matrix C = new Matrix(n, m);
+        if (A.n != B.n || A.m != B.m) throw new RuntimeException("Matrices don't have same dimensions!");
+        else{
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < m; j++) {
+                    C.data[i][j] =  A.data[i][j] + B.data[i][j];
+                }
+            }
+        }
+        return C;
+    }
+
+    public static Matrix subtractMatrix(Matrix A, Matrix B){
+        int n = A.n;
+        int m = A.m;
+        Matrix C = new Matrix(n, m);
+        if (A.n != B.n || A.m != B.m) throw new RuntimeException("Matrices don't have same dimensions!");
+        else{
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < m; j++) {
+                    C.data[i][j] =  A.data[i][j] - B.data[i][j];
+                }
+            }
+        }
+        return C;
+    }
+
     public void swap(int i, int j) {
         double[] temp = data[i];
         data[i] = data[j];
@@ -80,6 +110,7 @@ public class Matrix {
 
     public Matrix diagonalize(){
         Matrix A = new Matrix(this);
+        int swap_exp = 0;
         for (int i = 0; i < n; i++) {
 
             // find pivot row and swap
@@ -87,9 +118,12 @@ public class Matrix {
             for (int j = i + 1; j < n; j++)
                 if (Math.abs(A.data[j][i]) > Math.abs(A.data[max][i]))
                     max = j;
+
+            swap_exp += Math.abs(max - i);
             A.swap(i, max);
 
             // pivot A
+            // TODO: Hier irgendwo ein Fehler!
             for (int j = i + 1; j < n; j++) {
                 double m = A.data[j][i] / A.data[i][i];
                 for (int k = i+1; k < n; k++) {
@@ -101,16 +135,52 @@ public class Matrix {
         return A;
     }
 
+    public static double determinant(double A[][],int N)
+    {
+        double det=0;
+        if(N == 1)
+        {
+            det = A[0][0];
+        }
+        else if (N == 2)
+        {
+            det = A[0][0]*A[1][1] - A[1][0]*A[0][1];
+        }
+        else
+        {
+            det=0;
+            for(int j1=0;j1<N;j1++)
+            {
+                double[][] m = new double[N-1][];
+                for(int k=0;k<(N-1);k++)
+                {
+                    m[k] = new double[N-1];
+                }
+                for(int i=1;i<N;i++)
+                {
+                    int j2=0;
+                    for(int j=0;j<N;j++)
+                    {
+                        if(j == j1)
+                            continue;
+                        m[i-1][j2] = A[i][j];
+                        j2++;
+                    }
+                }
+                det += Math.pow(-1.0,1.0+j1+1.0)* A[0][j1] * determinant(m,N-1);
+            }
+        }
+        return det;
+    }
+
     public static double evalDet(Matrix A){
-        double det = 1;
+        double det;
 
         if (A.n != A.m){
             throw new RuntimeException("Matrix is not square");
         }
         else{
-            for (int i = 0; i < A.n; i++){
-                det = det * A.diagonalize().data[i][i];
-            }
+            det = determinant(A.data, A.n);
         }
         return det;
     }
@@ -177,7 +247,7 @@ public class Matrix {
         int N = A.n;
         double[][] transData = new double[N][N];
         for (int i = 0; i < N; i++) {
-            for (int j = 0; j <= i; j++) {
+            for (int j = 0; j <N; j++) {
                 transData[j][i] = A.data[i][j];
             }
         }
@@ -240,6 +310,90 @@ public class Matrix {
         Matrix result = new Matrix(L);
 
         return result;
+    }
+
+    private static Matrix identity(int n){
+        Matrix E = new Matrix(n, n);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == j){
+                    E.data[i][j] = 1;
+                }
+                else {
+                    E.data[i][j] = 0;
+                }
+            }
+        }
+        return E;
+    }
+
+    public static Matrix remainderMatrix(Matrix A, int K, int L){
+        int n = A.n;
+        Matrix R = new Matrix(n-1, n-1);
+        int p = 0;
+        for (int i = 0; i < n; ++i) {
+            if (i == K){
+                continue;
+            }
+            int q = 0;
+            for (int j = 0; j < n; ++j) {
+                if (j == L){
+                    continue;
+                }
+                R.data[p][q] = A.data[i][j];
+                ++q;
+            }
+            ++p;
+        }
+        return R;
+    }
+
+    public static Matrix scaleMatrix(Matrix A, double a){
+        int n = A.n;
+        int m = A.m;
+        Matrix B = new Matrix(n, m);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                B.data[i][j] = A.data[i][j] * a;
+            }
+        }
+        return B;
+    }
+
+    public static Matrix calculateInverse(Matrix A){
+        int n = A.n;
+        if (!isSquare(A)) {
+            throw new RuntimeException("Matrix is not square");
+        }
+        if (evalDet(A) == 0){
+            throw new RuntimeException("Matrix not regular");
+        }
+        Matrix E = identity(A.n);
+        Matrix temp = new Matrix(n, n);
+        Matrix I = new Matrix(n, n);
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                temp.data[i][j] = evalDet(remainderMatrix(A, i, j)) * Math.pow(-1, i+j);
+            }
+        }
+        I = scaleMatrix(transpose(temp), 1/(evalDet(A)));
+        return I;
+    }
+    public static Matrix calculateLeontiefInverse(Matrix A){
+        int n = A.n;
+        if (!isSquare(A)) {
+            throw new RuntimeException("Matrix is not square");
+        }
+        if (evalDet(A) == 0){
+            throw new RuntimeException("Matrix not regular");
+        }
+        Matrix E = identity(A.n);
+        Matrix temp = new Matrix(n, n);
+        Matrix I = new Matrix(n, n);
+        temp = subtractMatrix(E, A);
+        I = calculateInverse(temp);
+        return I;
     }
 
 }
