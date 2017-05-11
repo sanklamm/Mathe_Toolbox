@@ -123,7 +123,6 @@ public class Matrix {
             A.swap(i, max);
 
             // pivot A
-            // TODO: Hier irgendwo ein Fehler!
             for (int j = i + 1; j < n; j++) {
                 double m = A.data[j][i] / A.data[i][i];
                 for (int k = i+1; k < n; k++) {

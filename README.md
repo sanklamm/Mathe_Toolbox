@@ -11,3 +11,6 @@
 ## Berechnen einer Determinante
 * mit vorheriger Diagonalisierung nach Gauss
 
+## Leontief-Inverse
+* Berechnung der Inversen einer Matrix
+* Damit Berechnung der Leontief-Inversen.
