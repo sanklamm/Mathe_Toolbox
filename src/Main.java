@@ -11,7 +11,7 @@ public class Main {
         //double[][] matData_leon = {{1., 0., 2.},{2., 1., 3.},{0., 3., 1.}};
         Matrix mat_leon = new Matrix(matData_leon);
         Matrix mat_leon_2 = new Matrix(matData_leon_2);
-        Matrix mat_leon_3 = new Matrix(matData_leon_2);
+        Matrix mat_leon_3 = new Matrix(matData_leon);
         Matrix rand01 = Matrix.random(4, 4);
 
         // Test Streichmatrix
@@ -34,11 +34,11 @@ public class Main {
         System.out.println("Diagonalmatrix");
         mat_leon_3.diagonalize().show();
         System.out.println("Inverse");
-        Matrix.calculateInverse(mat_leon_2).show();
+        Matrix.calculateInverse(mat_leon_3).show();
         System.out.println("Leontief-Inverse");
-        Matrix.calculateLeontiefInverse(mat_leon_2).show();
+        Matrix.calculateLeontiefInverse(mat_leon_3).show();
         System.out.println("Determinante");
-        System.out.println(Matrix.evalDet(mat_leon_2));
+        System.out.println(Matrix.evalDet(mat_leon_3));
 
         System.out.println("Random Matrix");
         rand01.show();
